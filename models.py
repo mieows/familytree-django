@@ -91,15 +91,20 @@ def connect_siblings(sender, instance, action, reverse, model, pk_set, **kwargs)
 			except:
 				sibling.siblings.add(instance)
 
-def connect_siblings(sender, instance, action, reverse, model, pk_set, **kwargs):        
+def connect_partner(sender, instance, action, reverse, model, pk_set, **kwargs):        
 	if action == "pre_clear":
-		
+		for otherHalf in instance.partner.all():
+			try:
+				me = otherHalf.partner.get(id=instance.pk)
+			except:
+				otherHalf.partner.remove(instance)
+
 	if action == "post_add":
 		for otherHalf in instance.partner.all():
 			try:
 				me = otherHalf.partner.get(id=instance.pk)
 			except:
-				otherHalf.partner.add(instnace)
+				otherHalf.partner.add(instance)
 
 m2m_changed.connect(connect_partner, sender=Person.parents.through)
 m2m_changed.connect(connect_siblings, sender=Person.siblings.through)
